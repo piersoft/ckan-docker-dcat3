@@ -1,27 +1,4 @@
-01.06.2024 VERSIONE NON STABILE E CON MOLTI ERRORI: DA NON USARE IN PRODUZIONE. 
-
-07.06.2024 AGGIORNATO FRONTEND DI CKAN CON HVD, ACCESS SERVICE E APPLICABLE LEGISLATION. 
-
-18.06.2024 PRESENTI ANCORA ALCUNI BUG IN HARVESTING JSON. 
-
-19.06.2024 SE SI VUOLE AVERE IL FILTRO HVD CATEGORY modificare in ckan.ini -> search.facets = organization groups tags res_format license_id hvd_category
-
-20.06.2024 RISOLTO HARVESTING SIA IN RDF/TTL CHE CON DCAT JSON. ESEGUIRE 2 VOLTE L'HARVESTING PER ATTIVARE PATCH SUCCESSIVE SU FORMATI,ACCESS_RIGHTS ect
-
-27.06.2024 La mappatura automatica dei GRUPPI durante gli harvesting, è settata manualmente nel file [mapping.py](https://github.com/piersoft/ckan-docker/blob/master/ckan/patches/ckanext-dcatapit/ckanext/dcatapit/mapping.py) (estensione DCATAPIT) e non in nella variabile ckanext.dcatapit.theme_group_mapping.file in ckan.ini. Punta a /srv/app/patches/theme_to_group.ini . Questo file viene copiato automaticamente in quella posizione, non bisogna fare nulla nella compilazione da Docker proposta. Se si fanno configurazioni differenti, va modificato il path.
-
-**27.09.2024** Il codice è al 99,999% pronto per una installazione stand alone. le patch che ogni tanto aggiorno sono per harvesting di cataloghi remoti. Se non è il vostro caso, credo che si possa considerare stabile.
-
-**09.04.2025** nel file [__euro_dcat_ap.py__](https://github.com/piersoft/ckan-docker/blob/master/ckan/patches/ckanext-dcat/ckanext/dcat/profiles/euro_dcat_ap.py) è inserita una patch delicata. l'accessURL viene sostituito con la landingpage della risorsa sul CKAN e il downloadURL viene popolato con il valore di download della risorsa (ex accessURL). Sostituire il path del dominio con il proprio portale CKAN:
-
-	    if dataset_dict.get('id'):
-               resource_dict['access_url']='https://www.piersoftckan.biz/dataset/'+dataset_dict['id']+'/resource/'+resource_dict['id']
-
-Se NON si vuole tale trasformazione, commentare le due righe di codice precedenti. il downloadURL, in tal caso, verrà impostato identico all'accessURL
-	       
-**DATA.EUROPA.EU** richiede che le accessURL e i downloadURL siano raggiunbili in HEAD con risposta 200. Testare le proprie risorse con CURL -I URL 
-
-Versione beta, stabile
+04.05.2025 VERSIONE STABILE DI DCAT3 CON SCHEMA PERSONALIZZATO PER RightsHolder (proprietà del DCATAP_IT) e varie patch per estensione harvesting
 
 
 
@@ -50,7 +27,6 @@ The CKAN images used are from the official CKAN [ckan-docker](https://github.com
 
 The non-CKAN images are as follows:
 
-* DataPusher: CKAN's [pre-configured DataPusher image](https://github.com/ckan/ckan-base/tree/main/datapusher).
 * PostgreSQL: Official PostgreSQL image. Database files are stored in a named volume.
 * Solr: CKAN's [pre-configured Solr image](https://github.com/ckan/ckan-solr). Index data is stored in a named volume.
 * Redis: standard Redis image
@@ -89,7 +65,7 @@ Using the default values on the `.env.example` file will get you a working CKAN 
 
 ## First step: 
 
-	git clone https://github.com/piersoft/ckan-docker.git
+	git clone https://github.com/piersoft/ckan-docker-dcat3.git
 
 To build the images (remember before to rename and configure .env.example file) :
 
@@ -99,23 +75,6 @@ To start the containers:
 
 	docker compose up -d
 
-
-
-**PS: if CKAN failed (unhealty) launch docker start ckan and after 2-3 minutes launch docker start nginx.**
-
-**IMPORTANT AFTER CKAN IS RUNNING HEALTY (ONLY FIRST TIME):**
-
-*Go to into docker:*
-
-docker exec -it ckan bash 
-
-cd /dockerentry-point 
-
-sh 03.ckan_group.end
-
-exit
-
-docker restart ckan
 
 
 This will start up the containers in the current window. By default the containers will log direct to this window with each container
